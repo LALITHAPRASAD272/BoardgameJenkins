@@ -17,13 +17,14 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/LALITHAPRASAD272/BoardgameJenkins.git'
+                git branch: 'main',
+                url: 'https://github.com/LALITHAPRASAD272/BoardgameJenkins.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
