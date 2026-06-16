@@ -1,11 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'JAVA'
+        maven 'mvn'
+    }
+
     environment {
-        IMAGE_NAME    = "board-app"
+        IMAGE_NAME     = "board-app"
         DOCKERHUB_USER = "prasadpalnati"
-        EKS_CLUSTER   = "prasadk8s-cluster1"
-        AWS_REGION    = "ap-south-1"
+        EKS_CLUSTER    = "prasadk8s-cluster1"
+        AWS_REGION     = "ap-south-2"
     }
 
     stages {
@@ -24,19 +29,19 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withCredentials([string(credentialsId: 'jenkins-token', variable: 'SONAR_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
                     sh '''
                     mvn sonar:sonar \
                     -Dsonar.projectKey=Boardgame \
                     -Dsonar.projectName=Boardgame \
-                    -Dsonar.host.url=http://3.108.225.110:9000 \
+                    -Dsonar.host.url=http://18.60.40.117:9000 \
                     -Dsonar.login=$SONAR_TOKEN
                     '''
                 }
             }
         }
 
-        stage('Trivy Scan') {
+        stage('Trivy File Scan') {
             steps {
                 sh 'trivy fs .'
             }
@@ -50,11 +55,19 @@ pipeline {
             }
         }
 
+        stage('Trivy Image Scan') {
+            steps {
+                sh '''
+                trivy image $DOCKERHUB_USER/$IMAGE_NAME:latest
+                '''
+            }
+        }
+
         stage('Docker Hub Login') {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub',
+                        credentialsId: 'dockerhub-creds',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
