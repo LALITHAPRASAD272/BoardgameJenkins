@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: board-app
-        image: prasadpalnati/board-app:latest
+        image: prasadpalnati/board-applp:latest
         ports:
         - containerPort: 8080
