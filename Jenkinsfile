@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME     = "board-app"
+        IMAGE_NAME     = "board-applp"
         DOCKERHUB_USER = "prasadpalnati"
         EKS_CLUSTER    = "prasadk8s-cluster1"
         AWS_REGION     = "ap-south-2"
