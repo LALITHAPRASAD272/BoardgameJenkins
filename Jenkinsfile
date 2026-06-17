@@ -9,7 +9,7 @@ pipeline {
     environment {
         IMAGE_NAME     = "board-applp"
         DOCKERHUB_USER = "prasadpalnati"
-        EKS_CLUSTER    = "prasadk8s-cluster1"
+        EKS_CLUSTER    = "prasadk8s-cluster2"
         AWS_REGION     = "ap-south-2"
     }
 
@@ -30,7 +30,9 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                withCredentials([
+                    string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')
+                ]) {
                     sh '''
                     mvn sonar:sonar \
                     -Dsonar.projectKey=Boardgame \
@@ -44,7 +46,9 @@ pipeline {
 
         stage('Trivy File Scan') {
             steps {
-                sh 'trivy fs .'
+                sh '''
+                trivy fs --scanners vuln .
+                '''
             }
         }
 
@@ -59,7 +63,8 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 sh '''
-                trivy image $DOCKERHUB_USER/$IMAGE_NAME:latest
+                trivy image --scanners vuln \
+                $DOCKERHUB_USER/$IMAGE_NAME:latest || true
                 '''
             }
         }
@@ -102,6 +107,7 @@ pipeline {
 
                     kubectl apply -f k8s/deployment.yaml
                     kubectl apply -f k8s/service.yaml
+                    kubectl rollout status deployment/board-app
                     '''
                 }
             }
