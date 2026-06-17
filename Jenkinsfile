@@ -35,7 +35,7 @@ pipeline {
                     mvn sonar:sonar \
                     -Dsonar.projectKey=Boardgame \
                     -Dsonar.projectName=Boardgame \
-                    -Dsonar.host.url=http://18.60.40.117:9000 \
+                    -Dsonar.host.url=http://18.61.156.109:9000 \
                     -Dsonar.login=$SONAR_TOKEN
                     '''
                 }
